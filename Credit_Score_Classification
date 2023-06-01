@@ -1,1 +1,59 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split,GridSearchCV,cross_val_score
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report as cr,confusion_matrix as cm
 
+data=pd.read_csv('credi_score.csv')
+data1=data.drop('Unnamed: 0',axis=1)
+
+data1.head()
+
+data1.isnull().sum()
+
+data1=data1.dropna()
+
+data1.isnull().sum()
+
+data1.info()
+
+data1.describe().transpose().round(2)
+
+fig,axs=plt.subplots(figsize=(15,15))
+sns.heatmap(data1.corr(),cmap='Greens')
+
+data1['Annual_Income'].median()
+
+data1.columns
+
+X = data1[["Annual_Income", "Monthly_Inhand_Salary", "Num_Bank_Accounts", "Num_Credit_Card", "Interest_Rate", "Num_of_Loan", 
+        "Delay_from_due_date", "Num_of_Delayed_Payment", "Credit_Mix", "Outstanding_Debt", "Credit_History_Age", 
+        "Monthly_Balance"]]
+y = data1[['Credit_Score']]
+
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y,stratify=y, test_size=0.30, random_state=69)
+
+svm=SVC().fit(X_train,y_train)
+
+y_pred=svm.predict(X_test)
+report=cr(y_test,y_pred)
+print(report)
+conf_matr=cm(y_test,y_pred)
+print(conf_matr)
+
+report=cr(y_test,y_pred)
+
+# Create the Random Forest Classifier
+rfc = RandomForestClassifier()
+
+rf=rfc.fit(X_train,y_train)
+
+y_pred_rfc=rf.predict(X_test)
+
+report=cr(y_test,y_pred_rfc)
+print(report)
